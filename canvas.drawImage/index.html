@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Document</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+    }
+
+    body,
+    html {
+      height: 100%;
+    }
+
+    .box img {
+      vertical-align: middle;
+      background-color: #ccc;
+    }
+
+    #c {
+      border-top: 2px solid red;
+      background-color: rgba(90, 214, 223, 0.5);
+    }
+    
+  </style>
+</head>
+
+<body>
+  <div class="box">
+    <img src="./test2.png" alt="">
+  </div>
+  <canvas id="c"></canvas>
+  <script>
+    var clientWidth = document.body.clientWidth;
+    var clientHeight = document.body.clientHeight;
+
+    var box = document.querySelector('.box');
+    var imgDom = document.querySelector('img');
+
+    var canvas = document.querySelector('#c');
+    var cvs = canvas.getContext('2d');
+
+
+    box.style.width = clientWidth + 'px';
+    box.style.height = clientHeight + 'px';
+
+    canvas.width = clientWidth;
+    canvas.height = clientHeight;
+
+
+    // 375 667
+    // 500 800
+    
+    var widthScale = 500 / 375;
+    var heightScale = 800 / 667;
+    console.log(widthScale);
+    console.log(heightScale);
+    
+
+    // 截取操作
+    document.onclick = function () {
+      // var w = clientWidth * widthScale;
+      // var h = clientHeight * heightScale;
+      // console.log(w, h);
+      // cvs.drawImage(imgDom, 0, 0, w, h);
+
+      cvs.drawImage(imgDom, -110, -100, clientWidth, clientHeight);
+    }
+  </script>
+</body>
+
+</html>

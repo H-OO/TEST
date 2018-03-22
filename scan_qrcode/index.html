@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0,maximum-scale=1.0, user-scalable=no">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>cutIMG</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+    }
+
+    body,
+    html {
+      height: 100%;
+      /* overflow: hidden; */
+    }
+
+    #v {
+      width: 100%;
+      /* height: 400px; */
+      border-bottom: 3px solid #000;
+      background-color: #ccc;
+    }
+
+    #c {
+      background-color: #666;
+    }
+  </style>
+  <script type="text/javascript" src="./lib/grid.js"></script>
+  <script type="text/javascript" src="./lib/version.js"></script>
+  <script type="text/javascript" src="./lib/detector.js"></script>
+  <script type="text/javascript" src="./lib/formatinf.js"></script>
+  <script type="text/javascript" src="./lib/errorlevel.js"></script>
+  <script type="text/javascript" src="./lib/bitmat.js"></script>
+  <script type="text/javascript" src="./lib/datablock.js"></script>
+  <script type="text/javascript" src="./lib/bmparser.js"></script>
+  <script type="text/javascript" src="./lib/datamask.js"></script>
+  <script type="text/javascript" src="./lib/rsdecoder.js"></script>
+  <script type="text/javascript" src="./lib/gf256poly.js"></script>
+  <script type="text/javascript" src="./lib/gf256.js"></script>
+  <script type="text/javascript" src="./lib/decoder.js"></script>
+  <script type="text/javascript" src="./lib/qrcode.js"></script>
+  <script type="text/javascript" src="./lib/findpat.js"></script>
+  <script type="text/javascript" src="./lib/alignpat.js"></script>
+  <script type="text/javascript" src="./lib/databr.js"></script>
+  <script src="./vconsole.min.js"></script>
+</head>
+
+<body>
+  <div class="container">
+    <video id="v"></video>
+    <canvas id="c"></canvas>
+  </div>
+  <script>
+    /**
+     * 
+     */
+    var video = document.querySelector('#v');
+    var canvas = document.querySelector('#c');
+    var ctx = canvas.getContext('2d');
+
+    // 获取浏览器可视范围的宽高
+    var clientWidth = document.body.clientWidth;
+    var clientHeight = document.body.clientHeight;
+
+    // DOM同步宽高
+    video.width = clientWidth;
+    video.height = clientHeight;
+
+    canvas.width = clientWidth;
+    canvas.height = clientHeight - 100;
+
+    var videoWidth, videoHeight, widthScale, heightScale;
+
+    // var widthScale = 500 / 375;
+    // var heightScale = 800 / 667;
+
+    video.onplay = function () {
+      // 视频宽高
+      videoWidth = video.videoWidth;
+      videoHeight = video.videoHeight;
+
+      // 比例值
+      widthScale = videoWidth / clientWidth;
+      heightScale = videoHeight / clientHeight;
+    }
+
+    // 截图
+    video.onclick = function () {
+      var w = clientWidth * widthScale;
+      var h = clientHeight * heightScale;
+      console.log(w, h);
+      // ctx.drawImage(video, 0, 0, w, h);
+      ctx.drawImage(video, 0, 0, clientWidth, clientHeight - 100);
+      qrcode.callback = function (content) {
+        alert(content);
+      };
+      // console.log(canvas.toDataURL().slice(0, 27) + '...');
+      // qrcode.decode('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAGQAAABkCAYAAABw4pVUAAAFRUlEQVR4Xu2c65biMAyDh/d/6NnDUnY7beN8Ei4DB/G3uTiWLV/Scvn6+vr+OvH3/f1/+cvl8mOn6tlIpPWc65jtmut5dP3tmqO9q726VHjVUABZGU2l2AByoJ2P8hDquooVVWuuLc7d213DmVdRrktZ2zV/UJarlLUwitCOUrYHd9dw5ilnowAFkEVTbweIEsBoJlVZ9yg7mlkalZPGHkqxV7loFrc9QzVvSFn0oDPBlAPeBVeok8oZQBbtBpC9j8dDNvRSFZSKAb09ZbmVOj14RUvKM1qpU7leNoYEkBs0L0NZAeTFAJmlsPfnSgHm1BOzpiRtUL49ZQWQeMjQBpz6xaXclw3q8ZAHPIQqb9YOoVU3tdhKrjNqCLctRPX3Us3FtdAB5KaNX22/B5D9FfRLXuEqVXWV9jrPugI3pawd5b/inXoAceEE82hQdKx5W+B1ABkPWUANIEtQ/6Z5KfCGZww5w4KpFz/lfAGk7r4+214vAeRNAOmiBocOlL1pda4E/FF9pHgL7ULvKvWRhyhKoe0M2lZX9g4gkxeclc7mSJkB5MDEFaXEQ/YaaKcsJcWjNUTlPbSvRSnqup4y9r4/fX/LXX87D8eQALIUaptvWtZ6cQAPIAPLGrX7f91D1s1FirgrNL3z6EhRZ/TocLwiFz1r2e0NIFpwdmNnFQ7wBZW7ufOqjGKJbjLwFh5CA7miMHpwundXOj7aj7LEjBJLL1glCjtdOhdUAWSv7q62inWFG0ACyD8NfBRldfBnle4p6fLZHO/ENtocpfHwaJyVZSkNxKqydXL1DqO5yhRAhK+YKgsLIAfaOdt1u9bv8AJKP26WZVfqVQGmCEMOGEAWLVHFdilsBE7X+vEQYv5gTAABHtLRy9rxZdFCALj9HUIzNaWYHdEzZZDqnLNzWWmvUk/QrOjswwaQB71uZkn35x/jIW7FfYYlKrLQRGFUsHa1ZmyPH90YKkqg8cWlL0WWADJpQ9DUk4JatW0qmqOgxkMWLQaQmyKsLKuyUqWGoAF5xPez9JJeH9Nxinc6zBBADjJBxUjcmFi1oeIhTX/V5xa9WwMYfh+iUA8Npm4qWFkUrVeoNdP1ruPc81ReGECE9osSQ6iR7jzL+T5EsSIa3OiaCse7yQCVJR5ykjWfAbLtIR2Vusvx1MKolylFnZPqUnln6XgJVgDxW/iU2hQPtP5IuStjoRb3UR6yDuodB3/EXUcWRw2AjnM7DS4lKjXKj7Q3gOzpq4o19FkAOXC1M7q9pwDifEFFg9mskBopqeuK2M3+3PNRyi0r9QDSrf79eoqBtTQX6ZGoYHSc0k9SUk96HjpOOU8AoVp9YJwEyDP/Dci10jOC50i/bpdbmWd1ex8wiOHUAHJTTQAR7i4US6+yOLdItb4xVLyHtkfc7iiVxVUQpUulisfNRXo4ZVwA4c3Lv3TmfBYdQG4acL0nHmL+VdMjSnfuW3Yecga9dFuRIiPtX7nB2Z3X0jqhNKUEN8eKAghFYhkXQPbxZatCy0OUIs6lpdE81wuUebRSF+3xcLiScltXuNtdA0gNWwB5wKwVZqDbBBCqqYNxHwXIGe2Rjrjhpq8d83YB33kvy40hAWTuuk8N6gHkxQCh/KzcsHVneJXKlOBM19nq5KkeEkD2RWMAWUy3u21DjW3WsIyHCJ84/CplzcPP8QjlCtR5dbWKLx0Kc9dQ5KrOjV8DogAFkJumSqXTP1LuKLICSCMg1AuUcQ4FdKW9NPWsKm66hmuIZaWuKJqODSB7TeH7EKpkZVwACSDIXkaG0lVPOIZ4FfwPkn6/NMMwQ3QAAAAASUVORK5CYII=');
+      qrcode.decode(canvas.toDataURL());
+    }
+
+
+
+    /**
+     * 调用摄像头
+     */
+    // 老的浏览器可能根本没有实现 mediaDevices，所以我们可以先设置一个空的对象
+    if (navigator.mediaDevices === undefined) {
+      navigator.mediaDevices = {};
+    }
+
+    // 一些浏览器部分支持 mediaDevices。我们不能直接给对象设置 getUserMedia 
+    // 因为这样可能会覆盖已有的属性。这里我们只会在没有getUserMedia属性的时候添加它。
+    if (navigator.mediaDevices.getUserMedia === undefined) {
+      navigator.mediaDevices.getUserMedia = function (constraints) {
+
+        // 首先，如果有getUserMedia的话，就获得它
+        var getUserMedia = navigator.webkitGetUserMedia || navigator.mozGetUserMedia;
+
+        // 一些浏览器根本没实现它 - 那么就返回一个error到promise的reject来保持一个统一的接口
+        if (!getUserMedia) {
+          return Promise.reject(new Error('getUserMedia is not implemented in this browser'));
+        }
+
+        // 否则，为老的navigator.getUserMedia方法包裹一个Promise
+        return new Promise(function (resolve, reject) {
+          getUserMedia.call(navigator, constraints, resolve, reject);
+        });
+      }
+    }
+
+    navigator.mediaDevices.getUserMedia({
+        audio: false,
+        video: {
+          // width: 2960,
+          // height: 1440,
+          // 选择前后置摄像头（user前置 environment后置）
+          // facingMode: 'user'
+        }
+      })
+      .then(function (stream) {
+        // var video = document.querySelector('video');
+        // 旧的浏览器可能没有srcObject
+        if ("srcObject" in video) {
+          video.srcObject = stream;
+        } else {
+          // 防止在新的浏览器里使用它，因为它已经不再支持了
+          video.src = window.URL.createObjectURL(stream);
+        }
+        video.onloadedmetadata = function (e) {
+          video.play();
+        };
+      })
+      .catch(function (err) {
+        console.log(err.name + ": " + err.message);
+      });
+  </script>
+</body>
+
+</html>
